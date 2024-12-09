@@ -23,3 +23,24 @@ The menu has been changed in such a way it's a reduced and somewhat more basic m
 
 ## Crowsnest
 Default Sovol crowsnest .conf is added as well. Please add the webcam in Mainsail -> Interface Settings -> Webcams.
+
+## Install KAMP
+Follow https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging#installation
+
+## Install Demon Klipper
+```
+cd ~
+git clone https://github.com/3DPrintDemon/Demon_Klipper_Essentials_Unified.git
+
+ln -s ~/Demon_Klipper_Essentials_Unified ~/printer_data/config/demon-klipper
+
+mkdir -p ~/printer_data/config/demon-klipper-sv08
+wget https://github.com/3DPrintDemon/Voron-Stealthburner/blob/main/Firmware/RGB_LEDs.cfg -o ~/printer_data/config/demon-klipper-sv08/
+wget https://github.com/3DPrintDemon/Non_Blocking_Wait/releases/download/Heat_Soak_Timers_V1.0/Heat_Soak_Sovol_SV08.cfg -o ~/printer_data/config/demon-klipper-sv08/
+wget https://github.com/3DPrintDemon/SV08/releases/download/v1.0/demon_SV08_ML_display_v1.0.cfg -o ~/printer_data/config/demon-klipper-sv08/
+
+mkdir -p ~/printer_data/config/demon-klipper-cfg
+cp ~/printer_data/config/demon-klipper/demon_user_settings_v2.9.3.cfg ~/printer_data/config/demon-klipper-cfg/
+cp ~/printer_data/config/demon-klipper/demon_user_settings_cleaner_variables_v1.1.cfg ~/printer_data/config/demon-klipper-cfg/
+```
+
