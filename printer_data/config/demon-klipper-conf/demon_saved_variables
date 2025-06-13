@@ -1,3 +1,6 @@
 [Variables]
-last_known_z = 68.8
+last_known_z = 75.53
+loaded_state = False
+version_dvars = '1.0.1'
+version_dvars_updated = True
 
