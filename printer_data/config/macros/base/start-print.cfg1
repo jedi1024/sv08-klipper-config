@@ -13,7 +13,6 @@ gcode:
     {% set target_chamber = params.CHAMBER|default("40")|int %}
     {% set x_wait = printer.toolhead.axis_maximum.x|float / 2 %}
     {% set y_wait = printer.toolhead.axis_maximum.y|float / 2 %}
-    {% set current_bed = printer.heater_bed.temperature|int %}
     {% set skew_profile = printer["gcode_macro _USER_VARIABLES"].skew_profile %}
 
     RESPOND TYPE=COMMAND MSG="Filament Detected: {raw_material}"
@@ -55,42 +54,16 @@ gcode:
         M190 S{target_bed}
 
         # Start chamber heating progress monitoring
+        # Display chamber monitoring status
+        SET_DISPLAY_TEXT MSG="Monitoring chamber: {target_chamber}C"
+
         # Conditional check for chamber thermistor
         {% if printer["temperature_sensor chamber"] is defined %}
-            RESPOND TYPE=COMMAND MSG="Chamber temperature sensor is available."
-
             # Waits for the chamber to reach the desired temp
-            # Display chamber monitoring status
-            SET_DISPLAY_TEXT MSG="Waiting chamber: {target_chamber}C"
-
             TEMPERATURE_WAIT SENSOR="temperature_sensor chamber" MINIMUM={target_chamber}
         {% else %}
-            RESPOND TYPE=COMMAND MSG="Chamber temperature sensor is unavailable."
-
-            # Waits for 15mins by default when chamber temperature sensor is not available
-            {% set dynamic_soak_time = 15 %}
-
-            {% if current_bed >= target_bed %}
-                RESPOND TYPE=COMMAND MSG="Bed is hotter than target {target_bed}C"
-                {% set dynamic_soak_time = 3%}
-            {% else %}
-                {% set deviation = (target_bed - current_bed) / target_bed %}
-                {% if deviation >= 0.30  %}
-                    RESPOND TYPE=COMMAND MSG="Bed is {current_bed}C, < 70% of target {target_bed}C"
-                    {% set dynamic_soak_time = dynamic_soak_time * 1 %}
-                {% elif deviation >= 0.2 %}
-                    RESPOND TYPE=COMMAND MSG="Bed is {current_bed}C, 70% ~ 80% of target {target_bed}C"
-                    {% set dynamic_soak_time = dynamic_soak_time * 0.75%}
-                {% elif deviation >= 0.1 %}
-                    RESPOND TYPE=COMMAND MSG="Bed is {current_bed}C, 80% ~ 90% of target {target_bed}C"
-                    {% set dynamic_soak_time = dynamic_soak_time * 0.5%}
-                {% else%}
-                    RESPOND TYPE=COMMAND MSG="Bed is {current_bed}C, 90% or higher of target {target_bed}C"
-                    {% set dynamic_soak_time = 3%}
-                {% endif%}
-            {% endif%}
-            RESPOND TYPE=COMMAND MSG="Heat soak for {dynamic_soak_time} mins"
-            _HEAT_WAIT MINUTES={dynamic_soak_time}
+            # Waits for 15mins when chamber is not available
+            _HEAT_WAIT MINUTES={5}
         {% endif %}
     {% else %}
         # If the bed temp is not over 90c, then handle soak based on material
